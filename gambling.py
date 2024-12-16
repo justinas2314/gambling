@@ -42,8 +42,8 @@ ib.sleep(1)
 #pprint.pprint(dir(underlying))
 print('AAA')
 chains = ib.reqSecDefOptParams(underlying.symbol, '', underlying.secType, underlying.conId)
-print(chains[0])
-print(dir(chains[0]))
+#print(chains[0])
+#print(dir(chains[0]))
 chains = list(filter(lambda x: x.exchange == 'SMART', chains))
 
 #tickers = []
@@ -87,12 +87,12 @@ for expiration, options in interesting.items():
         K = call.strike
         C_ask = call_ticker.ask
         C_bid = call_ticker.bid
+        P_ask = put_ticker.ask
+        P_bid = put_ticker.bid
         pred_P_ask = C_ask - S_bid + K + F
         pred_P_bid = C_bid - S_ask + K * math.exp(-r * T) - F
         pred_C_ask = P_bid + S_bid - K * math.exp(-r * T) - F
         pred_C_bid = P_ask + S_ask - K * math.exp(-r * T) + F
-        P_ask = put_ticker.ask
-        P_bid = put_ticker.bid
         if math.isnan(P_bid) or (P_bid + 1) < 0.01:
             continue
         #print(call_ticker)
