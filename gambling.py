@@ -89,6 +89,8 @@ for expiration, options in interesting.items():
         C_bid = call_ticker.bid
         pred_P_ask = C_ask - S_bid + K + F
         pred_P_bid = C_bid - S_ask + K * math.exp(-r * T) - F
+        pred_C_ask = P_bid + S_bid - K * math.exp(-r * T) - F
+        pred_C_bid = P_ask + S_ask - K * math.exp(-r * T) + F
         P_ask = put_ticker.ask
         P_bid = put_ticker.bid
         if math.isnan(P_bid) or (P_bid + 1) < 0.01:
@@ -97,12 +99,18 @@ for expiration, options in interesting.items():
         #print(put_ticker)
         #print(expiration, K, C_ask, C_bid, P_ask, P_bid)
         #print(f'pred_ask: {pred_P_ask:.2f}', 'real_ask:', P_ask)
+        if C_bid > pred_C_bid:
+            good.append((C_bid - pred_C_bid, 'CALLSELL', K, expiration, pred_C_bid))
+        if C_ask < pred_C_ask:
+            good.append((pred_C_ask - C_ask, 'CALLBUY', K, expiration, pred_C_ask))
+
+        # SENI
         if pred_P_ask < P_ask:
             #print(f'Gotaro SELL {K} {expiration} {P_ask = } {pred_P_ask = }')
-            good.append((P_ask - pred_P_ask, 'SELL', K, expiration, pred_P_ask))
-        elif pred_P_bid > P_bid:
+            good.append((P_ask - pred_P_ask, 'PUTSELL', K, expiration, pred_P_ask))
+        if pred_P_bid > P_bid:
             #print(f'Gotaro BUY {K} {expiration} {P_bid = } {pred_P_bid = }')
-            good.append((pred_P_bid - P_bid, 'BUY', K, expiration, pred_P_bid))
+            good.append((pred_P_bid - P_bid, 'PUTBUY', K, expiration, pred_P_bid))
     if len(good) > 0:
         good.sort(key=lambda x: x[0], reverse=True)
         print('GERIAUSI')
